@@ -46,8 +46,3 @@ Solutions are organized by topics and problem patterns to make it easier to revi
 *If you find this repository helpful, feel free to ⭐ it!*
 
 ```
-
-
-Would you like me to help you format a specific folder for one of the problems we worked on, like the "Reverse Nodes in k-Group" solution?
-
-```
