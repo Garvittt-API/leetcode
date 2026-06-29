@@ -1,47 +1,54 @@
-from collections import Counter
-
 class Solution:
     def findSubstring(self, s: str, words: list[str]) -> list[int]:
-        if not s or not words:
-            return []
-        
         word_len = len(words[0])
         num_words = len(words)
         total_len = word_len * num_words
         s_len = len(s)
         
-        word_count = Counter(words)
-        res = []
+        # 1. Map words to IDs to avoid string hashing
+        word_to_id = {}
+        curr_id = 0
+        for w in words:
+            if w not in word_to_id:
+                word_to_id[w] = curr_id
+                curr_id += 1
         
-        # Iterate over each possible offset
+        target_counts = [0] * curr_id
+        for w in words:
+            target_counts[word_to_id[w]] += 1
+            
+        # 2. Convert s to a list of word IDs
+        # (This replaces string slicing in the loop)
+        s_ids = [-1] * (s_len - word_len + 1)
+        for i in range(s_len - word_len + 1):
+            sub = s[i : i + word_len]
+            if sub in word_to_id:
+                s_ids[i] = word_to_id[sub]
+
+        res = []
+        # 3. Slide through each offset
         for i in range(word_len):
             left = i
-            right = i
-            curr_count = Counter()
+            curr_counts = [0] * curr_id
             words_found = 0
             
-            # Slide the window by word_len chunks
-            while right + word_len <= s_len:
-                word = s[right : right + word_len]
-                right += word_len
-                
-                if word in word_count:
-                    curr_count[word] += 1
-                    words_found += 1
-                    
-                    # Shrink if frequency exceeds required count
-                    while curr_count[word] > word_count[word]:
-                        left_word = s[left : left + word_len]
-                        curr_count[left_word] -= 1
-                        words_found -= 1
-                        left += word_len
-                    
-                    if words_found == num_words:
-                        res.append(left)
-                else:
-                    # Reset window if word is not in target list
-                    curr_count.clear()
+            for right in range(i, s_len - word_len + 1, word_len):
+                w_id = s_ids[right]
+                if w_id == -1:
+                    curr_counts = [0] * curr_id
                     words_found = 0
-                    left = right
-                    
+                    left = right + word_len
+                    continue
+                
+                curr_counts[w_id] += 1
+                words_found += 1
+                
+                while curr_counts[w_id] > target_counts[w_id]:
+                    left_w_id = s_ids[left]
+                    curr_counts[left_w_id] -= 1
+                    words_found -= 1
+                    left += word_len
+                
+                if words_found == num_words:
+                    res.append(left)
         return res
