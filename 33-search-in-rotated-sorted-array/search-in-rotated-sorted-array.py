@@ -3,22 +3,20 @@ class Solution:
         low, high = 0, len(nums) - 1
         
         while low <= high:
-            mid = (low + high) // 2
+            mid = (low + high) >> 1  # Bitwise shift is sometimes faster
+            mid_val = nums[mid]
             
-            if nums[mid] == target:
+            if mid_val == target:
                 return mid
             
-            # Check if the left half is sorted
-            if nums[low] <= nums[mid]:
-                # Target is in the sorted left half
-                if nums[low] <= target < nums[mid]:
+            # Use direct comparison against bounds
+            if nums[low] <= mid_val:
+                if nums[low] <= target < mid_val:
                     high = mid - 1
                 else:
                     low = mid + 1
-            # Otherwise, the right half must be sorted
             else:
-                # Target is in the sorted right half
-                if nums[mid] < target <= nums[high]:
+                if mid_val < target <= nums[high]:
                     low = mid + 1
                 else:
                     high = mid - 1
