@@ -2,17 +2,19 @@ class Solution:
     def firstMissingPositive(self, nums: list[int]) -> int:
         n = len(nums)
         
-        # 1. Cyclic Sort: Place each number x at index x-1 if 1 <= x <= n
         for i in range(n):
-            while 1 <= nums[i] <= n and nums[i] != nums[nums[i] - 1]:
-                # Swap nums[i] with the element at its target position
-                target_idx = nums[i] - 1
-                nums[i], nums[target_idx] = nums[target_idx], nums[i]
+            # Cache nums[i] to avoid repeated list lookups
+            val = nums[i]
+            # Use a while loop to place the value in its correct position
+            while 1 <= val <= n and nums[val - 1] != val:
+                # Perform the swap directly
+                nums[val - 1], nums[i] = val, nums[val - 1]
+                # Update val to the new value that was swapped into index i
+                val = nums[i]
                 
-        # 2. Identify the first index where the value is not i + 1
+        # Final pass to find the first index mismatch
         for i in range(n):
             if nums[i] != i + 1:
                 return i + 1
                 
-        # 3. If all indices match, the missing number is n + 1
         return n + 1
