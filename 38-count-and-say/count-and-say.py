@@ -1,5 +1,3 @@
-from itertools import groupby
-
 class Solution:
     def countAndSay(self, n: int) -> str:
         res = "1"
