@@ -1,22 +1,19 @@
 class Solution:
     def numberOfSubstrings(self, s: str) -> int:
-        # Dictionary to keep track of the counts of 'a', 'b', and 'c'
-        count = {'a': 0, 'b': 0, 'c': 0}
-        left = 0
+        # Store the last seen index of 'a', 'b', and 'c'
+        # Initialize with -1 to indicate they haven't been seen yet
+        last_seen = [-1, -1, -1]
         result = 0
-        n = len(s)
         
-        for right in range(n):
-            count[s[right]] += 1
+        for i, char in enumerate(s):
+            # Update the last seen index for the current character
+            # ord(char) - ord('a') maps 'a'->0, 'b'->1, 'c'->2
+            last_seen[ord(char) - ord('a')] = i
             
-            # While the current window contains at least one of each character
-            while count['a'] > 0 and count['b'] > 0 and count['c'] > 0:
-                # All substrings starting from 'left' and ending at or after 'right' 
-                # are valid. There are (n - right) such substrings.
-                result += (n - right)
-                
-                # Shrink the window from the left
-                count[s[left]] -= 1
-                left += 1
-                
+            # The number of valid substrings ending at 'i' is the minimum 
+            # of the last seen indices of 'a', 'b', and 'c'.
+            # If all have been seen at least once, the valid substrings
+            # start from any index up to min(last_seen).
+            result += min(last_seen) + 1
+            
         return result
