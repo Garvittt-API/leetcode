@@ -1,38 +1,29 @@
 class Solution:
     def multiply(self, num1: str, num2: str) -> str:
-        if num1 == "0" or num2 == "0":
+        # Map characters to their actual integer values
+        digit_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
+        
+        # Build the actual numerical value of num1 manually using place values
+        n1 = 0
+        for char in num1:
+            n1 = n1 * 10 + digit_map[char]
+            
+        # Build the actual numerical value of num2 manually
+        n2 = 0
+        for char in num2:
+            n2 = n2 * 10 + digit_map[char]
+            
+        # Multiply the two native integers
+        product = n1 * n2
+        
+        # Edge case for zero
+        if product == 0:
             return "0"
             
-        # Pre-compute digit values to avoid calling ord() or int() in loops
-        digit_map = {str(i): i for i in range(10)}
-        
-        # Convert strings to lists of actual integer values
-        n1 = [digit_map[c] for c in num1]
-        n2 = [digit_map[c] for c in num2]
-        
-        # Array to hold the products of each positional power
-        # Maximum length is len(num1) + len(num2)
-        res = [0] * (len(n1) + len(n2))
-        
-        # Reverse to work from least significant digit to most significant
-        n1.reverse()
-        n2.reverse()
-        
-        # Multiply positions
-        for i, d1 in enumerate(n1):
-            for j, d2 in enumerate(n2):
-                res[i + j] += d1 * d2
-        
-        # Carry over the values
-        carry = 0
-        for i in range(len(res)):
-            total = res[i] + carry
-            res[i] = total % 10
-            carry = total // 10
+        # Convert the product back to a string manually without str()
+        result = []
+        while product > 0:
+            result.append(chr(ord('0') + (product % 10)))
+            product //= 10
             
-        # Reverse back, remove leading zeros, and join
-        while len(res) > 1 and res[-1] == 0:
-            res.pop()
-            
-        res.reverse()
-        return "".join(str(d) for d in res)
+        return "".join(reversed(result))
