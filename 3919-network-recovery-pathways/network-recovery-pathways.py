@@ -1,7 +1,14 @@
+from typing import List
+import sys
+
+# Increase recursion depth just in case N is large
+sys.setrecursionlimit(200000)
+
 class Solution:
     def findMaxPathScore(self, edges: List[List[int]], online: List[bool], k: int) -> int:
         n = len(online)
         
+        # Build adjacency list
         adj = [[] for _ in range(n)]
         min_cost = float('inf')
         max_cost = -1
@@ -16,31 +23,27 @@ class Solution:
         if max_cost == -1:
             return -1
 
+        # Linear time check using DFS + Memoization (No Priority Queue!)
         def check(mid: int) -> bool:
-            dist = [float('inf')] * n
-            dist[0] = 0
-            pq = [(0, 0)]  # (total_cost, node)
+            memo = {}
             
-            while pq:
-                curr_cost, u = heappop(pq)
-                
+            def get_min_cost(u: int) -> int:
                 if u == n - 1:
-                    return curr_cost <= k
-                if curr_cost > dist[u]:
-                    continue
-                if curr_cost > k:
-                    break
-                    
+                    return 0
+                if u in memo:
+                    return memo[u]
+                
+                res = float('inf')
                 for v, cost in adj[u]:
-                    if cost < mid:
-                        continue
-                    next_cost = curr_cost + cost
-                    if next_cost < dist[v]:
-                        dist[v] = next_cost
-                        heappush(pq, (next_cost, v))
-                        
-            return dist[n - 1] <= k
+                    if cost >= mid: # Only traverse valid bottleneck edges
+                        res = min(res, cost + get_min_cost(v))
+                
+                memo[u] = res
+                return res
+            
+            return get_min_cost(0) <= k
 
+        # Binary Search
         low, high = min_cost, max_cost
         ans = -1
         
@@ -48,8 +51,8 @@ class Solution:
             mid = (low + high) // 2
             if check(mid):
                 ans = mid
-                low = mid + 1
+                low = mid + 1  # Try to find a larger bottleneck
             else:
-                high = mid - 1
+                high = mid - 1 # Tighten the bottleneck threshold
                 
         return ans
