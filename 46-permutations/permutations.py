@@ -1,24 +1,26 @@
 class Solution:
     def permute(self, nums: list[int]) -> list[list[int]]:
         result = []
+        n = len(nums)
+        visited = [False] * n
         
         def backtrack(current_path):
-            # Base case: if current path is same length as nums, we found a permutation
-            if len(current_path) == len(nums):
+            if len(current_path) == n:
                 result.append(current_path[:])
                 return
             
-            for num in nums:
-                # Skip if the number is already in the current path
-                if num in current_path:
-                    continue
-                
-                # Choose the number
-                current_path.append(num)
-                # Explore
-                backtrack(current_path)
-                # Un-choose (backtrack)
-                current_path.pop()
-                
+            for i in range(n):
+                if not visited[i]:
+                    # Choose
+                    visited[i] = True
+                    current_path.append(nums[i])
+                    
+                    # Explore
+                    backtrack(current_path)
+                    
+                    # Backtrack (Un-choose)
+                    current_path.pop()
+                    visited[i] = False
+        
         backtrack([])
         return result
