@@ -1,15 +1,18 @@
 class Solution:
     def pathExistenceQueries(self, n: int, nums: list[int], maxDiff: int, queries: list[list[int]]) -> list[bool]:
-        # Pre-allocate array for fast, contiguous memory layout
-        group = [0] * n
+        # Localize EVERYTHING to eliminate scope resolution overhead
+        g = [0] * n
         curr = 0
         
-        # Micro-optimization: standard for-loops with local vars are fastest for mutating elements
+        # Pulling indexing mechanisms directly out of loops minimizes operations per step
+        prev_v = nums[0]
         for i in range(1, n):
-            if nums[i] - nums[i - 1] > maxDiff:
+            curr_v = nums[i]
+            if curr_v - prev_v > maxDiff:
                 curr += 1
-            group[i] = curr
+            g[i] = curr
+            prev_v = curr_v
             
-        # Using map with a lambda bypasses the byte-code execution loop of a list comprehension,
-        # executing the loop natively in C speed.
-        return list(map(lambda q: group[q[0]] == group[q[1]], queries))
+        # A fast list comprehension using local array 'g' 
+        # avoids tuple unpacking or function call overhead
+        return [g[q[0]] == g[q[1]] for q in queries]
